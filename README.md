@@ -1,5 +1,5 @@
 # rocnikovy-projekt
-Sidd
+Sidd, Nela
 
 1) Proč bychom to měli dělat
 Usnadnění tvoření rozvrhu
