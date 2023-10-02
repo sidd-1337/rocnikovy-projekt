@@ -1,5 +1,5 @@
 # rocnikovy-projekt
-Sidd, Nela
+Sidd, Nela, Matyáš
 
 1) Proč bychom to měli dělat
 Usnadnění tvoření rozvrhu
@@ -18,7 +18,3 @@ Má smysl ji dělat?
 V portálu, ale špatná
 2) Časový limit
 Pohoda
-
-ssss
-
-Matyášššššš
