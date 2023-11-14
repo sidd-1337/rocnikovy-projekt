@@ -1,4 +1,5 @@
 import requests
+import time
 
 def get_programmes(faculty,year):
     result_list = []
@@ -57,13 +58,18 @@ def get_schedule_by_subjects_by_programmes(SubjectsByProgramme):
     result_list_done = [sublist for sublist in result_list_filtered if sublist[0] is not None and sublist[0] != 0 and sublist[9]!=[]]
     return result_list_done
 
-ProgrammesByFaculty = get_programmes("FAU", "2023")
-print(ProgrammesByFaculty)
-SubjectsByFacultyProgrammes=get_subjects(ProgrammesByFaculty)
-print(SubjectsByFacultyProgrammes)
-ScheduleBySubjectByFaculty = get_schedule_by_subjects_by_programmes(SubjectsByFacultyProgrammes)
-print(ScheduleBySubjectByFaculty)
+faculties = ["FAU","FFI","FPD","FPR","FSS","FZS"]
+outputFiles = ["FAU.txt","FFI.txt","FPD.txt","FPR.txt","FSS.txt","FZS.txt"]
+for i in range(len(faculties)):
+    ProgrammesByFaculty = get_programmes(faculties[i], "2023")
+    print(ProgrammesByFaculty)
+    time.sleep(60)
+    SubjectsByFacultyProgrammes=get_subjects(ProgrammesByFaculty)
+    print(SubjectsByFacultyProgrammes)
+    time.sleep(60)
+    ScheduleBySubjectByFaculty = get_schedule_by_subjects_by_programmes(SubjectsByFacultyProgrammes)
+    print(ScheduleBySubjectByFaculty)
+    time.sleep(60)
+    with open(outputFiles[i], 'w') as file:
+        file.write(str(ScheduleBySubjectByFaculty))
 
-outputFile = "output2.txt"
-with open(outputFile, 'w') as file:
-   file.write(str(ScheduleBySubjectByFaculty))
