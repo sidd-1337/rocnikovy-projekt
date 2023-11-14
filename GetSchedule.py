@@ -23,6 +23,7 @@ for faculty in faculties:
        result_list.extend(sublist)
 """
 #print(result_list)
+
 faculty="FAU"
 response = requests.get(f'https://wsstag.osu.cz/ws/services/rest2/programy/getOboryQRAMInfo?outputFormat=JSON&fakulta={faculty}&rok=2023&pouzePlatne=true')
 if response.status_code == 200:
@@ -56,39 +57,44 @@ for item in result_list:
                 sublist = list(zip([oborId]*len(nazev_list), zkratka_list,katedra_list , nazev_list,statut_list,[nazevCZ]*len(nazev_list), [nazevEN]*len(nazev_list),[faculty] * len(nazev_list), year_list))
                 result2_list.extend(sublist)
 
-result3_list = []    
+#result2_list = [(1502, 'SZZ1', 'KSZ', 'Interpretace hudby', 'A', 'Zpěv', 'Singing', 'FAU', '2023')]
+#result2_list = [(1502, 'SZZ1', 'KSZ', 'Interpretace hudby', 'A', 'Zpěv', 'Singing', 'FAU', '2023'), (1502, 'SZZ2', 'KSZ', 'Absolventský koncert a jeho obhajoba', 'A', 'Zpěv', 'Singing', 'FAU', '2023'), (1515, '1AGD1', 'KGK', 'Ateliér grafického designu 1', 'A', 'Grafika', 'Graphic Art', 'FAU', '2023'), (1515, '1URE1', 'KGK', 'Speciální kresba 1', 'A', 'Grafika', 'Graphic Art', 'FAU', '2023'), (1515, '1URE1', 'KGK', 'Speciální kresba 1', 'A', 'Grafika', 'Graphic Art', 'FAU', '2023'), (1515, '1AGD2', 'KGK', 'Ateliér grafického designu 2', 'A', 'Grafika', 'Graphic Art', 'FAU', '2023'), (1515, '1AGD3', 'KGK', 'Ateliér grafického designu 3', 'A', 'Grafika', 'Graphic Art', 'FAU', '2023'), (1515, '1AGD4', 'KGK', 'Ateliér grafického designu 4', 'A', 'Grafika', 'Graphic Art', 'FAU', '2023'), (1515, '1KUR1', 'KMB', 'Kurátorství 1', 'B', 'Grafika', 'Graphic Art', 'FAU', '2023'), (1515, '1KUR1', 'KMB', 'Kurátorství 1', 'B', 'Grafika', 'Graphic Art', 'FAU', '2023'), (1515, '1KUR2', 'KMB', 'Kurátorství 2', 'B', 'Grafika', 'Graphic Art', 'FAU', '2023'), (1515, '1KUR2', 'KMB', 'Kurátorství 2', 'B', 'Grafika', 'Graphic Art', 'FAU', '2023'), (1515, '1AGD5', 'KGK', 'Ateliér grafického designu 5', 'A', 'Grafika', 'Graphic Art', 'FAU', '2023'), (1515, 'BSZZG', 'KGK', 'SZZ - Grafika', 'A', 'Grafika', 'Graphic Art', 'FAU', '2023'), (1515, '1AGD6', 'KGK', 'Ateliér grafického designu 6', 'A', 'Grafika', 'Graphic Art', 'FAU', '2023'), (1515, 'BSZZD', 'KTD', 'SZZ - Dějiny umění', 'A', 'Grafika', 'Graphic Art', 'FAU', '2023'), (1515, 'BSZZD', 'KTD', 'SZZ - Dějiny umění', 'A', 'Grafika', 'Graphic Art', 'FAU', '2023'), (1515, '1SZO', 'KMB', 'Workshop Škola zapomění', 'B', 'Grafika', 'Graphic Art', 'FAU', '2023')]
+
+result3_list = []
+   
 for item in result2_list:
     oborId, zkratka, katedra, nazev, statut, nazevCZ, nazevEN, faculty, year = item
     response = requests.get(f'https://wsstag.osu.cz/ws/services/rest2/rozvrhy/getRozvrhoveAkce?zkrPredm={zkratka}&pracoviste={katedra}&rokVarianty={year}&outputFormat=JSON')
     if response.status_code == 200:
         data = response.json()
-        for akce in data['rozvrhovaAkce']:
-            print("data")
-            print(data)
-            print("akce")
-            print(akce)
-            if(akce['den']!=None):
-                tyden = akce['tyden']
-                typHodiny = akce['typAkceZkr']
-                den = akce['den']
-                hodinaOd = akce['hodinaSkutOd']['value']
-                hodinaDo = akce['hodinaSkutDo']['value']
-                budova = akce['budova']
-                mistnost = akce['mistnost']
-                vsichniUciteleJmenaTituly = akce['vsichniUciteleJmenaTituly']
-                sublist = [oborId,zkratka, katedra, nazev, statut, nazevCZ, nazevEN, faculty, year, tyden,typHodiny,den,hodinaOd,hodinaDo,budova,mistnost,vsichniUciteleJmenaTituly]
-                result3_list.append(sublist)
+        tyden = [one['tyden'] for one in data ['rozvrhovaAkce']]
+        typHodiny = [one['typAkceZkr'] for one in data['rozvrhovaAkce']]
+        den = [one['den'] for one in data['rozvrhovaAkce']]
+        hodinaOd = [one ['hodinaSkutOd']['value'] for one in data['rozvrhovaAkce']]
+        hodinaDo = [one ['hodinaSkutDo']['value'] for one in data['rozvrhovaAkce']]
+        budova = [one['budova'] for one in data['rozvrhovaAkce']]
+        mistnost = [one['mistnost'] for one in data['rozvrhovaAkce']]
+        vsichniUciteleJmenaTituly = [one['vsichniUciteleJmenaTituly'] for one in data['rozvrhovaAkce']]
+        sublist = [oborId,zkratka, katedra, nazev, statut, nazevCZ, nazevEN, faculty, year, tyden,typHodiny,den,hodinaOd,hodinaDo,budova,mistnost,vsichniUciteleJmenaTituly]
+        result3_list.append(sublist)
 
 
+
+result3_list_filtered = [sublist for sublist in result3_list if None not in sublist[11]]
+result3_list_done = [sublist for sublist in result3_list_filtered if sublist[0] is not None and sublist[0] != 0]
+#print(result3_list_done)
 outputFile = "output2.txt"
 with open(outputFile, 'w') as file:
-    file.write(str(result3_list))
+   file.write(str(result3_list_done))
 
+"""
+   sublist = list(zip([oborId]*len(tyden),[zkratka]*len(tyden), [katedra]*len(tyden), [nazev]*len(tyden), [statut]*len(tyden), [nazevCZ]*len(tyden), [nazevEN]*len(tyden), [faculty]*len(tyden), [year]*len(tyden), tyden,typHodiny,den,hodinaOd,hodinaDo,budova,mistnost,vsichniUciteleJmenaTituly))
+       
 #response = requests.get(f'https://wsstag.osu.cz/ws/services/rest2/rozvrhy/getRozvrhoveAkce?zkrPredm=SZZ1&pracoviste=KSZ&rokVarianty=2023')
 #print(response.text)   
+"""
 
-
-""" 
+"""
 
 
 outputFile = "output.txt"
