@@ -24,7 +24,7 @@ public class TempSubjectsModel {
     private String nazev;
 
     @JsonProperty("predmet")
-    private String predmet;
+    private String zkratka;
 
     private Ucitel ucitel;
 
@@ -49,6 +49,9 @@ public class TempSubjectsModel {
     @JsonProperty("tydenZkr")
     private String tydenZkr;
 
+    @JsonProperty("katedra")
+    private String katedra;
+
     public TempSubjectsModel() {
         // Default constructor required by Spring Data
         this.createdAt = new Date();
@@ -56,13 +59,9 @@ public class TempSubjectsModel {
 
     // Getters and setters for your fields
 
-    public String getId() {
-        return id;
-    }
+    public String getId() {return id; }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    public void setId(String id) {this.id = id;}
 
     public Date getCreatedAt() {
         return createdAt;
@@ -87,12 +86,12 @@ public class TempSubjectsModel {
         this.nazev = nazev;
     }
 
-    public String getPredmet() {
-        return predmet;
+    public String getZkratka() {
+        return zkratka;
     }
 
-    public void setPredmet(String predmet) {
-        this.predmet = predmet;
+    public void setZkratka(String zkratka) {
+        this.zkratka = zkratka;
     }
 
     public Ucitel getUcitel() {
@@ -157,6 +156,14 @@ public class TempSubjectsModel {
 
     public void setTydenZkr(String tydenZkr) {
         this.tydenZkr = tydenZkr;
+    }
+
+    public String getKatedra() {
+        return katedra;
+    }
+
+    public void setKatedra(String katedra) {
+        this.katedra = katedra;
     }
 
     // Nested class representing 'ucitel'

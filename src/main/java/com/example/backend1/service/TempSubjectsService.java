@@ -65,7 +65,8 @@ public class TempSubjectsService {
         savedData.setCreatedAt(tempSubject.getCreatedAt());
         savedData.setRoakIdno(tempSubject.getRoakIdno());
         savedData.setNazev(tempSubject.getNazev());
-        savedData.setPredmet(tempSubject.getPredmet());
+        savedData.setZkratka(tempSubject.getZkratka());
+        savedData.setKatedra(tempSubject.getKatedra());
         savedData.setUcitel(tempSubject.getUcitel()); // Assuming TempSubjectsModel has a setUcitel method
         savedData.setBudova(tempSubject.getBudova());
         savedData.setMistnost(tempSubject.getMistnost());
