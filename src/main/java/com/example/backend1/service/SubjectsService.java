@@ -1,5 +1,4 @@
 package com.example.backend1.service;
-
 import com.example.backend1.model.SubjectsModel;
 import com.example.backend1.repository.SubjectsRepository;
 import org.slf4j.Logger;
@@ -13,6 +12,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class SubjectsService {
@@ -24,7 +25,8 @@ public class SubjectsService {
     @Autowired
     private SubjectsRepository subjectsRepository;
 
-    public void fetchDataAndSave(String oborId, String semester) {
+    public List<SubjectsModel> fetchDataAndSave(String oborId, String semester) {
+
         String apiUrlKatedra = API_URL.replace("{oborId}", oborId);
         String apiUrl = apiUrlKatedra.replace("{semester}", semester);
 
@@ -46,18 +48,22 @@ public class SubjectsService {
             // Save the fetched data to MongoDB
             if (tempSubjectsArray != null) {
                 Arrays.stream(tempSubjectsArray).forEach(tempSubject -> saveData(tempSubject, oborId));
+                return Arrays.asList(tempSubjectsArray);
             }
+            return Collections.emptyList(); // Return an empty list if no data was fetched
         } catch (HttpClientErrorException e) {
             LOGGER.error("Error while fetching data from API: {}", e.getMessage());
             // Handle the exception as needed
+            return Collections.emptyList();
         } catch (IOException e) {
             LOGGER.error("Error during JSON deserialization: {}", e.getMessage());
             // Handle the exception as needed
+            return Collections.emptyList();
         }
     }
 
     private void saveData(SubjectsModel tempSubject, String oborId) {
-        // Create a new TempSubjectsModel with only the required fields
+        // Create a new SubjectsModel with only the required fields
         SubjectsModel savedData = new SubjectsModel();
         savedData.setId(tempSubject.getId());
         savedData.setOborId(oborId);
@@ -69,7 +75,9 @@ public class SubjectsService {
         savedData.setDoporucenySemestr(tempSubject.getDoporucenySemestr());
         // Other fields you want to save can be set similarly
 
-        // Save the modified TempSubjectsModel to the repository
+        // Save the modified SubjectsModel to the repository
         subjectsRepository.save(savedData);
     }
 }
+
+

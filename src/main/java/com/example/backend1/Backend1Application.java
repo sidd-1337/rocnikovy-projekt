@@ -33,13 +33,15 @@ public class Backend1Application {
             // Call fetchDataAndSave with the desired parameters
             tempSubjectsService.fetchDataAndSave("KSN", "1VLA5");
         };
-    //}*/
+    //}
+
+
     @Bean
     public CommandLineRunner run(SubjectsService subjectsService) {
         return args -> {
             // Call fetchDataAndSave with the desired parameters
             subjectsService.fetchDataAndSave("3071", "LS");
         };
+    */
 
-    }
 }

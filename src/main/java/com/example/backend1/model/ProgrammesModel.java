@@ -26,6 +26,16 @@ public class ProgrammesModel {
 
     @JsonProperty("forma")
     private String forma;
+    public String getNazevCZ() {
+        return nazevCZ;
+    }
+
+    public String getOborIdno() {
+        return oborIdno;
+    }
+    public void setNazevCZ(String nazevCZ) {
+        this.nazevCZ = nazevCZ;
+    }
 
 
 }
