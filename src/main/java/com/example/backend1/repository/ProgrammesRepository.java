@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ProgrammesRepository extends MongoRepository<ProgrammesModel, String> {
     List<ProgrammesModel> findByFakultaOboruAndTypAndForma(String fakultaOboru, String typ, String forma);
-    String findOborIdByNazevCZAndFakultaOboruAndTypAndForma(String nazevCZ, String fakultaOboru, String typ, String forma);
+    List<String> findOborIdByNazevCZAndFakultaOboruAndTypAndForma(String nazevCZ, String fakultaOboru, String typ, String forma);
 }

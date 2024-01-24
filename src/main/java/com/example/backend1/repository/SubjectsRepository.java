@@ -7,5 +7,8 @@ import java.util.List;
 public interface SubjectsRepository extends MongoRepository<SubjectsModel, String> {
     boolean existsByOborId(String oborId);
     List<SubjectsModel> findByOborId(String oborId);
+
+    List<SubjectsModel> findByOborIdAndDoporucenySemestr(String oborId, String semester);
     List<SubjectsModel> findByOborIdAndDoporucenyRocnik(String oborId, String grade);
+    List<SubjectsModel> findByOborIdAndDoporucenyRocnikAndDoporucenySemestr(String highestOborIdStr, String grade, String semester);
 }
