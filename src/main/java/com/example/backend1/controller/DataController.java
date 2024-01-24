@@ -18,9 +18,14 @@ import java.util.Collections;
 import java.util.stream.Collectors;
 
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @RestController
 @RequestMapping("/api/data")
 public class DataController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataController.class);
 
     @Autowired
     private ProgrammesRepository programmesRepository;
@@ -60,45 +65,55 @@ public class DataController {
             @RequestParam String fakultaOboru,
             @RequestParam String typ,
             @RequestParam String forma,
-            @RequestParam String grade) {
+            @RequestParam String grade,
+            @RequestParam String semester) {
 
-        String programmesList = programmesRepository.findOborIdByNazevCZAndFakultaOboruAndTypAndForma(nazevCZ, fakultaOboru, typ, forma);
-        String oborId = "0";
-        try {
-            JsonNode rootNode = new ObjectMapper().readTree(programmesList);
-            oborId = rootNode.path("oborIdno").asText();
-        } catch (Exception e) {
-            // Handle the exception as needed
-            return Collections.emptyList(); // or throw an exception
+        List<String> jsonOborIds = programmesRepository.findOborIdByNazevCZAndFakultaOboruAndTypAndForma(nazevCZ, fakultaOboru, typ, forma);
+        LOGGER.info("Obor IDs returned from repository: {}", jsonOborIds);
+        int highestOborId = 0;
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        for (String json : jsonOborIds) {
+            try {
+                JsonNode rootNode = objectMapper.readTree(json);
+                int oborId = rootNode.path("oborIdno").asInt();
+                if (oborId > highestOborId) {
+                    highestOborId = oborId;
+                }
+            } catch (Exception e) {
+                LOGGER.error("Error processing JSON: {}", json, e);
+            }
         }
-        // Fetch data for the obtained oborId and save it if it is not already available
-        List<SubjectsModel> subjectsList = subjectsRepository.findByOborId(oborId);
+
+        String highestOborIdStr = Integer.toString(highestOborId);
+
+        LOGGER.info("Highest obor ID returned from repository: {}", highestOborIdStr);
+
+        List<SubjectsModel> subjectsList = subjectsRepository.findByOborIdAndDoporucenySemestr(highestOborIdStr, semester);
         if (subjectsList.isEmpty()) {
-            subjectsList = subjectsService.fetchDataAndSave(oborId, "LS");
-            // Call fetchDataAndSave for each subject in subjectsList
+            subjectsList = subjectsService.fetchDataAndSave(highestOborIdStr, semester);
             subjectsList.forEach(subject -> tempSubjectsService.fetchDataAndSave(subject.getKatedra(), subject.getZkratka()));
         }
-        subjectsList = subjectsRepository.findByOborIdAndDoporucenyRocnik(oborId, grade);
-        //Fetch data from tempSubjectsRepository based on katedra and zkratka
+        subjectsList = subjectsRepository.findByOborIdAndDoporucenyRocnikAndDoporucenySemestr(highestOborIdStr, grade, semester);
+
         List<TempSubjectsModel> tempSubjectsList = new ArrayList<>();
         subjectsList.forEach(subject -> {
             List<TempSubjectsModel> tempSubjectsForSubject = tempSubjectsRepository.findByZkratkaAndKatedra(subject.getZkratka(), subject.getKatedra());
             tempSubjectsList.addAll(tempSubjectsForSubject);
         });
-
         return tempSubjectsList;
     }
     @GetMapping("/getSubject")
     public List<TempSubjectsModel> getSubject(
             @RequestParam String zkratka,
             @RequestParam String katedra){
-    List<TempSubjectsModel> subjectList = tempSubjectsRepository.findByZkratkaAndKatedra(zkratka, katedra);
-    if(subjectList.isEmpty()) {
-        tempSubjectsService.fetchDataAndSave(katedra,zkratka);
-        subjectList = tempSubjectsRepository.findByZkratkaAndKatedra(zkratka,katedra);
+        List<TempSubjectsModel> subjectList = tempSubjectsRepository.findByZkratkaAndKatedra(zkratka, katedra);
+        if(subjectList.isEmpty()) {
+            tempSubjectsService.fetchDataAndSave(katedra,zkratka);
+            subjectList = tempSubjectsRepository.findByZkratkaAndKatedra(zkratka,katedra);
+            return subjectList;
+        }
         return subjectList;
-    }
-    return subjectList;
     }
 
 }
