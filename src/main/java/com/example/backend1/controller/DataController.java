@@ -12,7 +12,10 @@ import com.example.backend1.repository.SubjectsRepository;
 import com.example.backend1.service.TempSubjectsService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.Collectors;
@@ -43,7 +46,7 @@ public class DataController {
     private TempSubjectsRepository tempSubjectsRepository;
 
     @GetMapping("/getProgrammes")
-    public List<String> getProgrammes(
+    public List<Map<String, String>> getProgrammes(
             @RequestParam String fakultaOboru,
             @RequestParam String typ,
             @RequestParam String forma
@@ -51,13 +54,34 @@ public class DataController {
         // Fetch programmes based on faculty, typeOfStudy, and formOfStudy
         List<ProgrammesModel> programmesList = programmesRepository.findByFakultaOboruAndTypAndForma(fakultaOboru, typ, forma);
 
-        // Extract nazevCZ from the fetched programmes
-        List<String> nazevCZList = programmesList.stream()
-                .map(ProgrammesModel::getNazevCZ)
-                .distinct()
-                .collect(Collectors.toList());
+        // Use a LinkedHashMap to preserve insertion order and to keep track of unique nazevCZ
+        Map<String, Map<String, String>> processedProgrammes = new LinkedHashMap<>();
 
-        return nazevCZList;
+        programmesList.forEach(programme -> {
+            // Check if we already have an entry for this nazevCZ
+            Map<String, String> existingEntry = processedProgrammes.get(programme.getNazevCZ());
+            if (existingEntry == null) {
+                // If no entry exists, add the current programme
+                Map<String, String> programmeMap = new HashMap<>();
+                programmeMap.put("nazevCZ", programme.getNazevCZ());
+                programmeMap.put("nazevEN", programme.getNazevEN());
+                processedProgrammes.put(programme.getNazevCZ(), programmeMap);
+            } else if (programme.getNazevEN() != null && (existingEntry.get("nazevEN") == null || existingEntry.get("nazevEN").isEmpty())) {
+                // If an entry exists but the current programme has a non-null (and non-empty) nazevEN,
+                // replace the existing entry if the existing nazevEN is null or empty
+                existingEntry.put("nazevEN", programme.getNazevEN());
+            }
+            // If an entry exists and the current programme's nazevEN is null or the existing nazevEN is already non-null,
+            // do nothing (preserve the existing entry).
+        });
+        // Before returning, ensure nazevEN is set to nazevCZ if nazevEN is null
+        processedProgrammes.values().forEach(entry -> {
+            if (entry.get("nazevEN") == null || entry.get("nazevEN").isEmpty()) {
+                entry.put("nazevEN", entry.get("nazevCZ"));
+            }
+        });
+        // Convert the values of the map to a list
+        return new ArrayList<>(processedProgrammes.values());
     }
     @GetMapping("/getOborId")
     public List<TempSubjectsModel> getOborId(

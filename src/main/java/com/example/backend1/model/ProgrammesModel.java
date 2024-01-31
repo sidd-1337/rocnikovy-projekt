@@ -30,6 +30,9 @@ public class ProgrammesModel {
         return nazevCZ;
     }
 
+    public String getNazevEN() {return nazevEN; }
+
+
     public String getOborIdno() {
         return oborIdno;
     }
