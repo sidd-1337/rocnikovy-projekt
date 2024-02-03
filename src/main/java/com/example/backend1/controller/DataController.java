@@ -53,7 +53,7 @@ public class DataController {
     ) {
         // Fetch programmes based on faculty, typeOfStudy, and formOfStudy
         List<ProgrammesModel> programmesList = programmesRepository.findByFakultaOboruAndTypAndForma(fakultaOboru, typ, forma);
-
+        LOGGER.info("Programme", fakultaOboru, typ, forma);
         // Use a LinkedHashMap to preserve insertion order and to keep track of unique nazevCZ
         Map<String, Map<String, String>> processedProgrammes = new LinkedHashMap<>();
 
@@ -114,8 +114,10 @@ public class DataController {
         LOGGER.info("Highest obor ID returned from repository: {}", highestOborIdStr);
 
         List<SubjectsModel> subjectsList = subjectsRepository.findByOborIdAndDoporucenySemestr(highestOborIdStr, semester);
+        LOGGER.info("SubjectsList: {}", subjectsList);
         if (subjectsList.isEmpty()) {
-            subjectsList = subjectsService.fetchDataAndSave(highestOborIdStr, semester);
+            subjectsService.fetchDataAndSave(highestOborIdStr, semester);
+            subjectsList = subjectsRepository.findByOborIdAndDoporucenySemestr(highestOborIdStr, semester);
             subjectsList.forEach(subject -> tempSubjectsService.fetchDataAndSave(subject.getKatedra(), subject.getZkratka()));
         }
         subjectsList = subjectsRepository.findByOborIdAndDoporucenyRocnikAndDoporucenySemestr(highestOborIdStr, grade, semester);
