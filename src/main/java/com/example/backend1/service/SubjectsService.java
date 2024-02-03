@@ -29,7 +29,7 @@ public class SubjectsService {
 
         String apiUrlKatedra = API_URL.replace("{oborId}", oborId);
         String apiUrl = apiUrlKatedra.replace("{semester}", semester);
-
+        LOGGER.info("FetchandSave");
         try {
             ResponseEntity<String> responseEntity = new RestTemplate().getForEntity(apiUrl, String.class);
             String responseBody = responseEntity.getBody();
@@ -64,19 +64,24 @@ public class SubjectsService {
 
     private void saveData(SubjectsModel tempSubject, String oborId) {
         // Create a new SubjectsModel with only the required fields
-        SubjectsModel savedData = new SubjectsModel();
-        savedData.setId(tempSubject.getId());
-        savedData.setOborId(oborId);
-        savedData.setNazev(tempSubject.getNazev());
-        savedData.setZkratka(tempSubject.getZkratka());
-        savedData.setKatedra(tempSubject.getKatedra());
-        savedData.setStatut(tempSubject.getStatut());
-        savedData.setDoporucenyRocnik(tempSubject.getDoporucenyRocnik());
-        savedData.setDoporucenySemestr(tempSubject.getDoporucenySemestr());
+        List<SubjectsModel> exist = subjectsRepository.findByKatedraAndZkratka(tempSubject.getKatedra(),tempSubject.getZkratka());
+        if (exist.isEmpty()){
+            SubjectsModel savedData = new SubjectsModel();
+            savedData.setId(tempSubject.getId());
+            savedData.setOborId(oborId);
+            savedData.setNazev(tempSubject.getNazev());
+            savedData.setZkratka(tempSubject.getZkratka());
+            savedData.setKatedra(tempSubject.getKatedra());
+            savedData.setStatut(tempSubject.getStatut());
+            savedData.setDoporucenyRocnik(tempSubject.getDoporucenyRocnik());
+            savedData.setDoporucenySemestr(tempSubject.getDoporucenySemestr());
+            subjectsRepository.save(savedData);
+        } else{
+            LOGGER.info("Skipping save for existing record");
+        }
         // Other fields you want to save can be set similarly
-
         // Save the modified SubjectsModel to the repository
-        subjectsRepository.save(savedData);
+
     }
 }
 
