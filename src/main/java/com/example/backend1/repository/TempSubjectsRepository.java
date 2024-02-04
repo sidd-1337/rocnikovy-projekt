@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface TempSubjectsRepository extends MongoRepository<TempSubjectsModel, String> {
     List<TempSubjectsModel> findByZkratkaAndKatedra(String zkratka, String katedra);
+    List<TempSubjectsModel> findByZkratkaAndKatedraAndUcitelAndHodinaSkutOdAndHodinaSkutDoAndTydenZkrAndTypAkceZkrAndMistnost(String zkratka, String katedra, Object ucitel, Object hodinaSkutOd, Object hodinaSkutDo, String denZkr,String typAkceZkr, String mistnost);
+
 }
