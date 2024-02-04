@@ -120,6 +120,7 @@ public class DataController {
             subjectsList = subjectsRepository.findByOborIdAndDoporucenySemestr(highestOborIdStr, semester);
             subjectsList.forEach(subject -> tempSubjectsService.fetchDataAndSave(subject.getKatedra(), subject.getZkratka()));
         }
+        //add else - update when timestamp lower than threshold
         subjectsList = subjectsRepository.findByOborIdAndDoporucenyRocnikAndDoporucenySemestr(highestOborIdStr, grade, semester);
 
         List<TempSubjectsModel> tempSubjectsList = new ArrayList<>();

@@ -12,6 +12,6 @@ public interface SubjectsRepository extends MongoRepository<SubjectsModel, Strin
     List<SubjectsModel> findByOborIdAndDoporucenyRocnik(String oborId, String grade);
     List<SubjectsModel> findByOborIdAndDoporucenyRocnikAndDoporucenySemestr(String highestOborIdStr, String grade, String semester);
 
-    List<SubjectsModel> findByKatedraAndZkratka(String katedra, String zkratka);
+    List<SubjectsModel> findByKatedraAndZkratkaAndOborId(String katedra, String zkratka, String oborId);
 
 }

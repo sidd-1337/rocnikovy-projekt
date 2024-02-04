@@ -64,7 +64,7 @@ public class SubjectsService {
 
     private void saveData(SubjectsModel tempSubject, String oborId) {
         // Create a new SubjectsModel with only the required fields
-        List<SubjectsModel> exist = subjectsRepository.findByKatedraAndZkratka(tempSubject.getKatedra(),tempSubject.getZkratka());
+        List<SubjectsModel> exist = subjectsRepository.findByKatedraAndZkratkaAndOborId(tempSubject.getKatedra(),tempSubject.getZkratka(), oborId);
         if (exist.isEmpty()){
             SubjectsModel savedData = new SubjectsModel();
             savedData.setId(tempSubject.getId());
