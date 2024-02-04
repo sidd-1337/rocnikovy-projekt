@@ -1,5 +1,6 @@
 package com.example.backend1.service;
 
+import com.example.backend1.model.SubjectsModel;
 import com.example.backend1.model.TempSubjectsModel;
 import com.example.backend1.repository.TempSubjectsRepository;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class TempSubjectsService {
@@ -59,25 +61,30 @@ public class TempSubjectsService {
     }
 
     private void saveData(TempSubjectsModel tempSubject) {
-        // Create a new TempSubjectsModel with only the required fields
-        TempSubjectsModel savedData = new TempSubjectsModel();
-        savedData.setId(tempSubject.getId());
-        savedData.setCreatedAt(tempSubject.getCreatedAt());
-        savedData.setRoakIdno(tempSubject.getRoakIdno());
-        savedData.setNazev(tempSubject.getNazev());
-        savedData.setZkratka(tempSubject.getZkratka());
-        savedData.setKatedra(tempSubject.getKatedra());
-        savedData.setUcitel(tempSubject.getUcitel()); // Assuming TempSubjectsModel has a setUcitel method
-        savedData.setBudova(tempSubject.getBudova());
-        savedData.setMistnost(tempSubject.getMistnost());
-        savedData.setTypAkceZkr(tempSubject.getTypAkceZkr());
-        savedData.setDenZkr(tempSubject.getDenZkr());
-        savedData.setHodinaSkutOd(tempSubject.getHodinaSkutOd());
-        savedData.setHodinaSkutDo(tempSubject.getHodinaSkutDo());
-        savedData.setTydenZkr(tempSubject.getTydenZkr());
-        // Other fields you want to save can be set similarly
 
+        List<TempSubjectsModel> exist = tempSubjectsRepository.findByZkratkaAndKatedraAndUcitelAndHodinaSkutOdAndHodinaSkutDoAndTydenZkrAndTypAkceZkrAndMistnost(tempSubject.getZkratka(),tempSubject.getKatedra(),tempSubject.getUcitel(),tempSubject.getHodinaSkutOd(),tempSubject.getHodinaSkutDo(),tempSubject.getTydenZkr(),tempSubject.getTypAkceZkr(),tempSubject.getMistnost());
+        if (exist.isEmpty()){
+        // Create a new TempSubjectsModel with only the required fields
+            TempSubjectsModel savedData = new TempSubjectsModel();
+            savedData.setId(tempSubject.getId());
+            savedData.setCreatedAt(tempSubject.getCreatedAt());
+            savedData.setRoakIdno(tempSubject.getRoakIdno());
+            savedData.setNazev(tempSubject.getNazev());
+            savedData.setZkratka(tempSubject.getZkratka());
+            savedData.setKatedra(tempSubject.getKatedra());
+            savedData.setUcitel(tempSubject.getUcitel());
+            savedData.setBudova(tempSubject.getBudova());
+            savedData.setMistnost(tempSubject.getMistnost());
+            savedData.setTypAkceZkr(tempSubject.getTypAkceZkr());
+            savedData.setDenZkr(tempSubject.getDenZkr());
+            savedData.setHodinaSkutOd(tempSubject.getHodinaSkutOd());
+            savedData.setHodinaSkutDo(tempSubject.getHodinaSkutDo());
+            savedData.setTydenZkr(tempSubject.getTydenZkr());
+            // Other fields you want to save can be set similarly
+            tempSubjectsRepository.save(savedData);
         // Save the modified TempSubjectsModel to the repository
-        tempSubjectsRepository.save(savedData);
+        } else{
+            LOGGER.info("Skipping save for existing record - TempSubjects");
+        }
     }
 }
