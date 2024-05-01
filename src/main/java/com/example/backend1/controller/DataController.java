@@ -24,10 +24,18 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/data")
 public class DataController {
+    private boolean needsUpdate(Date createdAt, long thresholdHours) {
+        long currentTimeMillis = System.currentTimeMillis();
+        long createdAtMillis = createdAt.getTime();
+        long hoursElapsed = TimeUnit.MILLISECONDS.toHours(currentTimeMillis - createdAtMillis);
+        return hoursElapsed > thresholdHours;
+    }
     private static final Logger LOGGER = LoggerFactory.getLogger(DataController.class);
 
     @Autowired
@@ -109,7 +117,10 @@ public class DataController {
             }
         }
 
+
+
         String highestOborIdStr = Integer.toString(highestOborId);
+
 
         LOGGER.info("Highest obor ID returned from repository: {}", highestOborIdStr);
 
@@ -119,7 +130,36 @@ public class DataController {
             subjectsService.fetchDataAndSave(highestOborIdStr, semester);
             subjectsList = subjectsRepository.findByOborIdAndDoporucenySemestr(highestOborIdStr, semester);
             subjectsList.forEach(subject -> tempSubjectsService.fetchDataAndSave(subject.getKatedra(), subject.getZkratka()));
+        } else {
+            LOGGER.info("the data is being checked");
+            // Iterate over each subject to check and update temp subjects individually
+            subjectsList.forEach(subject -> {
+                List<TempSubjectsModel> tempSubjects = tempSubjectsRepository.findByZkratkaAndKatedra(subject.getZkratka(), subject.getKatedra());
+                //boolean anyTempSubjectUpdated = false;
+
+                // Check temp subject for updates
+                for (TempSubjectsModel tempSubject : tempSubjects) {
+                    if (needsUpdate(tempSubject.getCreatedAt(), 168)) { // 24 could be a configurable value
+                        LOGGER.info("Needs update{}",tempSubject);
+                        // Delete outdated temp subject
+                        tempSubjectsRepository.deleteAll(tempSubjects);
+
+                        // Fetch and save new temp subject data
+                        tempSubjectsService.fetchDataAndSave(subject.getKatedra(), subject.getZkratka());
+                        //anyTempSubjectUpdated = true;
+                    }
+                    break;
+                }
+
+                // If any temp subject was updated, re-fetch the list to update the local cache
+                //if (anyTempSubjectUpdated) {
+                //    List<TempSubjectsModel> updatedTempSubjects = tempSubjectsRepository.findByZkratkaAndKatedra(subject.getZkratka(), subject.getKatedra());
+                    // This line can be used if you need to process updated temp subjects immediately
+                    // tempSubjectsList.addAll(updatedTempSubjects);
+                //}
+            });
         }
+
         //add else - update when timestamp lower than threshold
         subjectsList = subjectsRepository.findByOborIdAndDoporucenyRocnikAndDoporucenySemestr(highestOborIdStr, grade, semester);
 
@@ -139,6 +179,20 @@ public class DataController {
             tempSubjectsService.fetchDataAndSave(katedra,zkratka);
             subjectList = tempSubjectsRepository.findByZkratkaAndKatedra(zkratka,katedra);
             return subjectList;
+        } else {
+            for (TempSubjectsModel tempSubject : subjectList) {
+                if (needsUpdate(tempSubject.getCreatedAt(), 24)) { // 24 could be a configurable value
+                    LOGGER.info("Data is outdated for TempSubject {}, updating data.", tempSubject.getId());
+                    // Delete all outdated temp subjects for this specific subject
+                    tempSubjectsRepository.deleteAll(subjectList);
+
+                    // Fetch and save new temp subject data
+                    tempSubjectsService.fetchDataAndSave(katedra, zkratka);
+
+                    break; // Break after updating to avoid redundant checks
+                }
+            }
+            subjectList=tempSubjectsRepository.findByZkratkaAndKatedra(zkratka,katedra);
         }
         return subjectList;
     }
