@@ -1,4 +1,4 @@
-# Getting Started
+# Timetable maker
 
 This repository is a backend of our project "timetable maker". For frontend repository click here - [frontend](https://github.com/sidd-1337/timetabemakertest). For more information about the project check out our [wiki page](https://github.com/sidd-1337/rocnikovy-projekt/wiki). 
 
@@ -14,5 +14,11 @@ To run the backend and frontend (main branches), you need to install:
 
 ---
 
-# Timetable maker
-made by Siddharth Shukla, Nela Bulavová, Matyáš Grendysa
+### How to run the project
+
+Details how to run the project can be found here: [Documentation](https://github.com/sidd-1337/rocnikovy-projekt/wiki/How-to-run-the-project%3F)
+
+---
+
+#### Creators
+Siddharth Shukla, Nela Bulavová, Matyáš Grendysa
